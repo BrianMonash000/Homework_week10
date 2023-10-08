@@ -1,0 +1,140 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 800,
+    "height": 600,
+    "padding": {
+      "left": 35,
+      "top": 30,
+      "right": 10
+
+    },
+    "title": "Price of Property in Melbourne vs. Landsize",
+    "data": {
+      "url": "https://raw.githubusercontent.com/BrianMonash000/Homework_week10/main/Data/Edited%20Melbourne%20Housing.csv"
+    },
+    "params": [
+      {
+        "name": "NumberOfBedrooms_Above",
+        "value": 1,
+        "bind": {
+          "input": "range",
+          "min": 1,
+          "max": 9,
+          "step": 1,
+          "name": "Number of bedrooms above: "
+        }
+      },
+      {
+        "name": "HouseType_Selection",
+        "bind": {
+          "input": "select",
+          "options": [
+            "h",
+            "t",
+            "u"
+          ],
+          "labels": [
+            "House",
+            "Townhouse",
+            "Unit/Apartment"
+          ],
+          "name": "Type of house selection: "
+        }
+      }
+    ],
+    "transform": [
+      {"filter": "datum.Landsize > 10"},
+      {"filter": "datum.Price > 0"},
+      {"filter": "datum.Car > 0"},
+      {"filter": "datum.Bathroom > 0"},
+      {"filter": "datum.BuildingArea > 0"},
+      {"filter": "datum.Bedroom2 > NumberOfBedrooms_Above"},
+      {
+        "filter": " datum.Type == HouseType_Selection || HouseType_Selection == 'House' " 
+      }
+    ],
+    "encoding": {
+      "x": {
+        "field": "Landsize",
+        "type": "quantitative",
+        "title": "Landsize (sqm)",
+        "axis": {"tickCount": 7},
+        "scale": {"type": "log", "domain": [1,100000]}
+      },
+      "y": {
+        "field": "Price",
+        "type": "quantitative",
+        "title": "Price (AUD)",
+        "axis": {
+          "tickCount": 6,
+          "format": ".2s",
+          "labelLimit": 0  
+          }
+        
+      }
+    },
+    "layer": [
+      {
+        "mark": "circle",
+        "encoding": {
+          "color": {
+            "field": "Type",
+            "type": "nominal",
+            "scale": {
+              "domain": [
+                "h",
+                "t",
+                "u"
+              ],
+              "range": [
+                "#d95f02",
+                "#1b9e77",
+                "#7570b3"
+              ]
+            },
+            "legend": {"labelExpr": "{'h': 'House','t': 'Townhouse','u': 'Unit/Apartment'}[datum.label]"}
+          },
+          "opacity": {"value": 0.6},
+          "tooltip": [
+            {"field": "Suburb", "type": "nominal"},
+            {"field": "Landsize", "title":"Land size (sqm)","type": "quantitative", "format": ","},
+            {"field": "Distance", "title":"Distance to CBD (km)","type": "quantitative", "format": ","},
+            {
+              "field": "Price",
+              "title": "Price (AUD)",
+              "type": "quantitative",
+              "format": ".3s"
+            }
+            
+          ]
+        }
+      },
+      {
+        "mark": {
+          "type": "text",
+          "align": "right",
+          "baseline": "middle",
+          "dx": -12,
+          "fontSize": 12.5,
+          "fontStyle": "italic"
+        },
+        "encoding": {
+          "text": {"field": "Suburb", "type": "nominal"},
+          "color": {"value": "black"},
+          "opacity": {
+            "condition": {
+              "test": "datum['PropertyID'] == '19583' || datum['PropertyID'] == '22632' || datum['PropertyID'] == '16105' || datum['PropertyID'] == '22700' || datum['PropertyID'] == '3539' || datum['PropertyID'] == '7912' ||datum['PropertyID'] == '13663'",
+              "value": 1
+            },
+            "value": 0
+          },
+          "tooltip": [
+            {"field": "Suburb", "type": "nominal"},
+            {"field": "Landsize", "title":"Land size (sqm)","type": "quantitative", "format": ","},
+            {"field": "Distance", "title":"Distance to CBD (km)","type": "quantitative", "format": ","},
+            {"field": "Price", "title":"Price (AUD)","type": "quantitative", "format": ".3s"}
+          ]
+        }
+      }
+    ]
+  }
