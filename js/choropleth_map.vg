@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Average Price of Property In Melbourne",
+  "width": 600,
+  "height": 500,
+  
+  "data": {
+    "url": "https://raw.githubusercontent.com/BrianMonash000/Assignment-2/main/js/choropleth_map.topojson.json",
+    "format": {"type": "topojson", "feature": "au-postcodes-Visvalingam-5"}
+  },
+  "projection": {"type": "equirectangular"},
+  "layer": [
+    {
+      "transform": [
+        {
+          "calculate": "'Data is not available in ' + datum.properties.POA_CODE",
+          "as": "note"
+        }
+      ],
+      "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"},
+      "encoding": {"tooltip": {"field": "note"}}
+    },
+
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/BrianMonash000/Assignment-2/main/js/graticules.json",
+        "format": {"type": "topojson", "feature": "ne_110m_graticules_1"}
+      },
+      "mark": {"type": "geoshape", "fill": null, "stroke": "darkblue"}
+    },
+    {
+      "transform": [
+        {
+          "lookup": "properties.POA_CODE",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/BrianMonash000/Assignment-2/main/data/Edited%20Melbourne%20Housing.csv"
+            },
+            "key": "Postcode",
+            "fields": ["Price", "Postcode", "Propertycount","Suburb"]
+          }
+        },
+        {
+          "joinaggregate": [{"field": "Price", "op": "mean", "as": "Average Price in $"}],
+          "groupby": ["properties.POA_CODE"]
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "white"},
+      "encoding": {
+        "color": {
+        "field": "Average Price in $",  
+        "type": "quantitative",
+        "scale": {
+        "type": "threshold",
+        "domain": [100000, 500000, 1000000],
+        "range": ["#fdbe85", "#fd8d3c", "#e6550d", "#a63603"]
+          }
+        },
+        "tooltip": [
+            {"field": "properties.POA_CODE", "type": "nominal", "title": "Postcode"},
+            {"field": "Suburb", "type": "nominal", "title": "Suburb"},
+            {"field": "Average Price in $", "type": "quantitative", "title": "Average Price in $"} 
+        ]
+      }
+    }
+  ]
+}
+
+
+
+
+
+
+
+
